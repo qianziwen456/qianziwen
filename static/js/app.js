@@ -10,6 +10,7 @@ const state = {
     flashOrder: 'order',
     learnedLines: JSON.parse(localStorage.getItem('qz_learned') || '[]'),
     knownChars: JSON.parse(localStorage.getItem('qz_known') || '[]'),
+    wrongChars: JSON.parse(localStorage.getItem('qz_wrong') || '[]'),
     coins: parseInt(localStorage.getItem('qz_coins') || '0'),
     level: parseInt(localStorage.getItem('qz_level') || '1'),
     quizScore: 0,
@@ -144,6 +145,10 @@ function switchMode(mode) {
         case 'list':
             $('listMode').style.display = 'block';
             renderList();
+            break;
+        case 'wrong':
+            $('wrongMode').style.display = 'block';
+            renderWrongBook();
             break;
     }
 }
@@ -310,7 +315,16 @@ function markFlashKnown() {
 }
 
 function markFlashUnknown() {
-    showToast('没关系，多看几遍就记住啦！');
+    const c = state.flashChars[state.currentFlashIndex];
+    const key = `${c.lineIndex}-${c.charIndex}`;
+    // 加入错题本（去重）
+    if (!state.wrongChars.includes(key)) {
+        state.wrongChars.push(key);
+        localStorage.setItem('qz_wrong', JSON.stringify(state.wrongChars));
+        showToast(`「${c.char}」已加入错题本 📕`);
+    } else {
+        showToast('这个字已经在错题本里啦');
+    }
     nextFlash();
 }
 
@@ -401,6 +415,94 @@ function renderList() {
         };
         container.appendChild(item);
     });
+}
+
+// ===== 错题本 =====
+function getCharByKey(key) {
+    const [lineIdx, charIdx] = key.split('-').map(Number);
+    if (QIANZI_DATA[lineIdx] && QIANZI_DATA[lineIdx].chars[charIdx]) {
+        return { ...QIANZI_DATA[lineIdx].chars[charIdx], lineIndex: lineIdx, charIndex: charIdx };
+    }
+    return null;
+}
+
+function renderWrongBook() {
+    const list = $('wrongList');
+    const empty = $('wrongEmpty');
+    const count = $('wrongCount');
+
+    count.textContent = state.wrongChars.length;
+
+    if (state.wrongChars.length === 0) {
+        list.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+    }
+
+    list.style.display = 'grid';
+    empty.style.display = 'none';
+    list.innerHTML = '';
+
+    state.wrongChars.forEach((key) => {
+        const c = getCharByKey(key);
+        if (!c) return;
+        const item = document.createElement('div');
+        item.className = 'wrong-item';
+        item.innerHTML = `
+            <button class="wi-remove" title="移除">✕</button>
+            <div class="wi-char">${c.char}</div>
+            <div class="wi-pinyin">${c.pinyin}</div>
+            <div class="wi-emoji">${c.emoji}</div>
+        `;
+        item.querySelector('.wi-remove').onclick = (e) => {
+            e.stopPropagation();
+            removeWrongChar(key);
+        };
+        item.onclick = () => {
+            speakSingleChar(c.char);
+        };
+        list.appendChild(item);
+    });
+}
+
+function removeWrongChar(key) {
+    state.wrongChars = state.wrongChars.filter(k => k !== key);
+    localStorage.setItem('qz_wrong', JSON.stringify(state.wrongChars));
+    renderWrongBook();
+    showToast('已从错题本移除');
+}
+
+function clearWrongBook() {
+    if (state.wrongChars.length === 0) {
+        showToast('错题本已经是空的啦');
+        return;
+    }
+    if (confirm('确定要清空错题本吗？')) {
+        state.wrongChars = [];
+        localStorage.setItem('qz_wrong', JSON.stringify(state.wrongChars));
+        renderWrongBook();
+        showToast('错题本已清空 🎉');
+    }
+}
+
+function reviewWrongChars() {
+    if (state.wrongChars.length === 0) {
+        showToast('错题本是空的，没有需要复习的字');
+        return;
+    }
+    // 用错题本的字来做卡片复习
+    state.flashChars = state.wrongChars.map(key => getCharByKey(key)).filter(c => c !== null);
+    // 随机打乱
+    for (let i = state.flashChars.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [state.flashChars[i], state.flashChars[j]] = [state.flashChars[j], state.flashChars[i]];
+    }
+    state.currentFlashIndex = 0;
+    // 切换到卡片模式，但不重置分组设置
+    $('flashMode').style.display = 'block';
+    $('wrongMode').style.display = 'none';
+    renderFlashCard();
+    showToast('开始复习错题本中的字 加油！');
 }
 
 // ===== 统计与进度 =====

@@ -134,6 +134,7 @@ body {
 .mode-card.mode-flash { border-color: #43e97b; }
 .mode-card.mode-quiz { border-color: #fa709a; }
 .mode-card.mode-list { border-color: #feca57; }
+.mode-card.mode-wrong { border-color: #a855f7; }
 
 .mode-icon {
     font-size: 50px;
@@ -465,8 +466,8 @@ body {
 }
 
 .flash-card {
-    width: 300px;
-    height: 380px;
+    width: 340px;
+    height: 440px;
     perspective: 1000px;
     cursor: pointer;
     margin-bottom: 25px;
@@ -501,6 +502,17 @@ body {
 .card-front {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    overflow: hidden;
+}
+
+.card-front::before {
+    content: "📖";
+    position: absolute;
+    font-size: 200px;
+    opacity: 0.1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .card-back {
@@ -510,26 +522,31 @@ body {
 }
 
 .card-char {
-    font-size: 120px;
+    font-size: 130px;
     font-weight: bold;
     text-shadow: 4px 4px 8px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
 }
 
 .card-hint {
     margin-top: 20px;
-    font-size: 14px;
-    opacity: 0.8;
+    font-size: 15px;
+    opacity: 0.85;
+    position: relative;
+    z-index: 1;
 }
 
 .card-pinyin {
-    font-size: 36px;
+    font-size: 40px;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .card-emoji {
-    font-size: 60px;
-    margin-bottom: 20px;
+    font-size: 90px;
+    margin-bottom: 15px;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
 }
 
 .card-meaning {
@@ -729,6 +746,122 @@ body {
 .list-meaning {
     font-size: 14px;
     color: #666;
+}
+
+/* ===== 错题本 ===== */
+.wrong-container {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.wrong-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #666;
+    font-weight: bold;
+}
+
+.wrong-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.warning-btn {
+    background: linear-gradient(90deg, #fa709a, #fee140);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.warning-btn.small-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.wrong-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.wrong-item {
+    background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+    border: 2px solid #e9d5ff;
+    border-radius: 16px;
+    padding: 15px 10px;
+    text-align: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.wrong-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(168,85,247,0.2);
+}
+
+.wrong-item .wi-char {
+    font-size: 36px;
+    font-weight: bold;
+    color: #7c3aed;
+    margin-bottom: 5px;
+}
+
+.wrong-item .wi-pinyin {
+    font-size: 14px;
+    color: #a855f7;
+    margin-bottom: 5px;
+}
+
+.wrong-item .wi-emoji {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.wrong-item .wi-remove {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.5;
+    color: #999;
+}
+
+.wrong-item .wi-remove:hover {
+    opacity: 1;
+    color: #e53935;
+}
+
+.wrong-empty {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+}
+
+.wrong-empty p {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.empty-tip {
+    font-size: 14px !important;
+    color: #999 !important;
 }
 
 /* ===== 成就弹窗 ===== */

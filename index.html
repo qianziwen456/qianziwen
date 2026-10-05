@@ -61,6 +61,12 @@
                     <p>浏览千字文全文，逐句学习</p>
                     <div class="mode-btn">去浏览 →</div>
                 </div>
+                <div class="mode-card mode-wrong" onclick="switchMode('wrong')">
+                    <div class="mode-icon">📕</div>
+                    <h3>错题本</h3>
+                    <p>不认识的字都在这里，反复练习</p>
+                    <div class="mode-btn">去复习 →</div>
+                </div>
             </div>
 
             <!-- 学习进度 -->
@@ -197,6 +203,29 @@
                 <h2>千字文全文</h2>
             </div>
             <div class="list-container" id="listContainer"></div>
+        </section>
+
+        <!-- 错题本页 -->
+        <section class="wrong-mode" id="wrongMode" style="display:none;">
+            <div class="mode-header">
+                <button class="back-btn" onclick="switchMode('select')">← 返回</button>
+                <h2>📕 错题本</h2>
+            </div>
+            <div class="wrong-container">
+                <div class="wrong-info">
+                    <span>共 <span id="wrongCount">0</span> 个不认识的字</span>
+                    <div class="wrong-actions">
+                        <button class="primary-btn small-btn" onclick="reviewWrongChars()">🎴 卡片复习</button>
+                        <button class="warning-btn small-btn" onclick="clearWrongBook()">🗑️ 清空错题本</button>
+                    </div>
+                </div>
+                <div class="wrong-list" id="wrongList"></div>
+                <div class="wrong-empty" id="wrongEmpty" style="display:none;">
+                    <div class="empty-icon">🎉</div>
+                    <p>错题本是空的，太棒了！</p>
+                    <p class="empty-tip">在识字卡片中遇到不认识的字，点击"不认识"会自动加入这里</p>
+                </div>
+            </div>
         </section>
     </main>
 
