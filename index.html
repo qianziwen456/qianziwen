@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 千字文学习乐园</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="top-bar">
+        <div class="logo">
+            <span class="logo-icon">📖</span>
+            <span class="logo-text">千字文学习乐园</span>
+        </div>
+        <div class="top-actions">
+            <!-- 字体大小调节 -->
+            <div class="font-control">
+                <button class="icon-btn" onclick="changeFontSize(-1)" title="缩小字体">A-</button>
+                <button class="icon-btn" onclick="changeFontSize(1)" title="放大字体">A+</button>
+            </div>
+            <div class="coin-display">
+                <span class="coin-icon">⭐</span>
+                <span id="coinCount">0</span>
+            </div>
+            <div class="level-display">
+                <span class="level-icon">🏆</span>
+                <span>等级 <span id="levelNum">1</span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 模式选择页 -->
+        <section class="mode-select" id="modeSelect">
+            <h2 class="welcome-title">欢迎来到千字文乐园！🎉</h2>
+            <p class="welcome-subtitle">选择一个模式开始学习吧～</p>
+            <div class="mode-cards">
+                <div class="mode-card mode-learn" onclick="switchMode('learn')">
+                    <div class="mode-icon">📚</div>
+                    <h3>逐字学习</h3>
+                    <p>认识每一个字，了解它的读音和意思</p>
+                    <div class="mode-btn">开始学习 →</div>
+                </div>
+                <div class="mode-card mode-flash" onclick="switchMode('flash')">
+                    <div class="mode-icon">🎴</div>
+                    <h3>识字卡片</h3>
+                    <p>翻转卡片，按组学习，支持随机打乱</p>
+                    <div class="mode-btn">开始挑战 →</div>
+                </div>
+                <div class="mode-card mode-quiz" onclick="switchMode('quiz')">
+                    <div class="mode-icon">✏️</div>
+                    <h3>小测验</h3>
+                    <p>看拼音选汉字，考考你认识多少字</p>
+                    <div class="mode-btn">去答题 →</div>
+                </div>
+                <div class="mode-card mode-list" onclick="switchMode('list')">
+                    <div class="mode-icon">📋</div>
+                    <h3>全文浏览</h3>
+                    <p>浏览千字文全文，逐句学习</p>
+                    <div class="mode-btn">去浏览 →</div>
+                </div>
+            </div>
+
+            <!-- 学习进度 -->
+            <div class="progress-section">
+                <h3>📊 我的学习进度</h3>
+                <div class="progress-stats">
+                    <div class="stat-box">
+                        <div class="stat-num" id="statLearned">0</div>
+                        <div class="stat-label">已学句子</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" id="statTotal">0</div>
+                        <div class="stat-label">总句子</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" id="statPercent">0%</div>
+                        <div class="stat-label">完成度</div>
+                    </div>
+                </div>
+                <div class="progress-bar-big">
+                    <div class="progress-fill-big" id="progressFill"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 逐字学习页 -->
+        <section class="learn-mode" id="learnMode" style="display:none;">
+            <div class="mode-header">
+                <button class="back-btn" onclick="switchMode('select')">← 返回</button>
+                <h2>逐字学习</h2>
+            </div>
+            <div class="learn-container">
+                <div class="line-display">
+                    <div class="line-text" id="lineText"></div>
+                    <div class="line-pinyin" id="linePinyin"></div>
+                </div>
+                <div class="line-meaning" id="lineMeaning"></div>
+                <div class="chars-grid" id="charsGrid"></div>
+                <div class="learn-nav">
+                    <button class="nav-btn" onclick="prevLine()">⬅️ 上一句</button>
+                    <button class="tts-btn" onclick="speakLine()">🔊 朗读全句</button>
+                    <span class="line-counter" id="lineCounter"></span>
+                    <button class="nav-btn" onclick="nextLine()">下一句 ➡️</button>
+                </div>
+                <div class="learn-actions">
+                    <button class="primary-btn" onclick="markLineLearned()">✓ 我学会了</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 识字卡片页 -->
+        <section class="flash-mode" id="flashMode" style="display:none;">
+            <div class="mode-header">
+                <button class="back-btn" onclick="switchMode('select')">← 返回</button>
+                <h2>识字卡片</h2>
+            </div>
+            <div class="flash-settings">
+                <div class="setting-group">
+                    <label>分组：</label>
+                    <select id="groupSelect" onchange="changeGroupSize()">
+                        <option value="10">每10句一组</option>
+                        <option value="20">每20句一组</option>
+                        <option value="0">全部</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>第</label>
+                    <select id="groupNum" onchange="changeGroupNum()"></select>
+                    <label>组</label>
+                </div>
+                <div class="setting-group">
+                    <label>顺序：</label>
+                    <select id="orderSelect">
+                        <option value="order">按顺序</option>
+                        <option value="random">随机打乱</option>
+                    </select>
+                </div>
+                <button class="primary-btn small-btn" onclick="applyFlashSettings()">应用</button>
+            </div>
+            <div class="flash-container">
+                <div class="flash-card" id="flashCard" onclick="flipCard()">
+                    <div class="flash-card-inner">
+                        <div class="card-front">
+                            <div class="card-char" id="cardChar"></div>
+                            <div class="card-hint">👆 点击卡片看答案</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-pinyin" id="cardPinyin"></div>
+                            <div class="card-emoji" id="cardEmoji"></div>
+                            <div class="card-meaning" id="cardMeaning"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flash-nav">
+                    <button class="nav-btn" onclick="prevFlash()">⬅️ 上一个</button>
+                    <button class="tts-btn" onclick="speakChar()">🔊 朗读</button>
+                    <span class="flash-counter" id="flashCounter"></span>
+                    <button class="nav-btn" onclick="nextFlash()">下一个 ➡️</button>
+                </div>
+                <div class="flash-actions">
+                    <button class="success-btn" onclick="markFlashKnown()">✓ 我认识</button>
+                    <button class="warning-btn" onclick="markFlashUnknown()">❌ 不认识</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 测验页 -->
+        <section class="quiz-mode" id="quizMode" style="display:none;">
+            <div class="mode-header">
+                <button class="back-btn" onclick="switchMode('select')">← 返回</button>
+                <h2>小测验</h2>
+            </div>
+            <div class="quiz-container">
+                <div class="quiz-info">
+                    <span>第 <span id="quizNum">1</span> 题</span>
+                    <span>⭐ <span id="quizScore">0</span> 分</span>
+                </div>
+                <div class="quiz-question">
+                    <div class="quiz-pinyin" id="quizPinyin"></div>
+                    <div class="quiz-hint">请选出对应的汉字：</div>
+                </div>
+                <div class="quiz-options" id="quizOptions"></div>
+                <div class="quiz-result" id="quizResult" style="display:none;"></div>
+                <div class="quiz-nav">
+                    <button class="primary-btn" id="quizNextBtn" onclick="nextQuiz()" style="display:none;">下一题 →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 全文浏览页 -->
+        <section class="list-mode" id="listMode" style="display:none;">
+            <div class="mode-header">
+                <button class="back-btn" onclick="switchMode('select')">← 返回</button>
+                <h2>千字文全文</h2>
+            </div>
+            <div class="list-container" id="listContainer"></div>
+        </section>
+    </main>
+
+    <!-- 成就弹窗 -->
+    <div class="achievement-popup" id="achievementPopup" style="display:none;">
+        <div class="achievement-content">
+            <div class="achievement-icon" id="achievementIcon">🎉</div>
+            <h3 id="achievementTitle">太棒了！</h3>
+            <p id="achievementDesc">你又学会了新的知识！</p>
+            <button class="primary-btn" onclick="closeAchievement()">继续加油</button>
+        </div>
+    </div>
+
+    <!-- 底部装饰 -->
+    <div class="bottom-deco">🌈 ✨ 🎈 🌟 🦋 ✨ 🌈</div>
+
+    <script src="static/js/data.js"></script>
+    <script src="static/js/app.js"></script>
+</body>
+</html>

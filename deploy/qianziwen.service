@@ -1,0 +1,15 @@
+[Unit]
+Description=千字文学习 App
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/qianziwen
+ExecStart=/usr/bin/python3 /opt/qianziwen/app.py
+Restart=always
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
